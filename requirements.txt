@@ -1,0 +1,6 @@
+manim>=0.19
+gradio>=4.0
+numpy
+scipy
+# 선택: 설치되어 있으면 셀프 어텐션 검증에서 PyTorch 구현과도 대조한다
+# torch

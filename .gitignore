@@ -1,0 +1,17 @@
+# 실행 결과 (설정·영상·로그는 실행마다 새로 생김)
+web_runs/
+media/
+snap_*.png
+
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# 편집기·OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
