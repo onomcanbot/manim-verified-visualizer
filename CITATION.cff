@@ -4,8 +4,9 @@ title: "manim-verified-visualizer: 검증형 Manim 시각화 생성기"
 type: software
 authors:
   - family-names: Jung
-    given-names: Tae Won
+    given-names: Taewon
     affiliation: "Kwangwoon University"
+    orcid: "https://orcid.org/0000-0002-9732-0881"
 license: MIT
 repository-code: "https://github.com/onomcanbot/manim-verified-visualizer"
 keywords:
@@ -21,6 +22,7 @@ preferred-citation:
     - family-names: "정"
       given-names: "태원"
       affiliation: "광운대학교 인제니움대학"
+      orcid: "https://orcid.org/0000-0002-9732-0881"
     - family-names: "안"
       given-names: "성수"
       affiliation: "명지전문대학"
