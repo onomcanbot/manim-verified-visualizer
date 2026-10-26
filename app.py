@@ -60,7 +60,7 @@ DEMOS = {
     "gcn":       dict(core=gc, file="gcn_demo.py",       scene="GCNMessagePassing", label="GCN 메시지 패싱"),
     "gan":       dict(core=gn, file="gan_demo.py",       scene="GANModeCollapse",   label="GAN 모드 붕괴"),
 }
-QUALITY = {"미리보기 (480p, 약 1~2분)": "l", "보통 (720p)": "m", "고화질 (1080p, 오래 걸림)": "h"}
+QUALITY = {"480p 미리보기": "l", "720p 보통": "m", "1080p 고화질": "h"}
 RENDER_TIMEOUT = 1800   # 초
 
 
@@ -148,8 +148,8 @@ def bp_verify(*v):
         r = bp.run(bp_cfg(*v))
     except Exception as e:
         return status_md(False, f"설정 오류: `{e}`"), ""
-    detail = (f"수치미분 대조 최악 오차 **{r['err_num']:.1e}** "
-              f"(데모 값 + 무작위 {r['n_random']}세트, 허용 {bp.TOL:.0e})  \n"
+    detail = (f"수치미분 대조 최대 오차: 현재 설정 **{r['err_demo']:.1e}** · "
+              f"무작위 {r['n_random']}세트 포함 최악 {r['err_num']:.1e} (허용 {bp.TOL:.0e})  \n"
               f"손실 L: {r['fwd']['loss']:.4f} → 1회 갱신 후 {r['fwd_new']['loss']:.4f}")
     return status_md(r["passed"], detail), bp.report(r)
 
@@ -394,7 +394,8 @@ def llm_bench(model, url, set_name="dev", prompt=lr.DEFAULT_PROMPT):
         yield "먼저 모델을 고르세요."
         return
     n = len(lr.SETS[set_name])
-    lines = [f"{model} · 세트 {set_name} ({n}문항) · 프롬프트 {prompt} (문항마다 수 초~수십 초)",
+    lines = [f"{model} · 세트 {set_name} ({n}문항) · {lr.PROMPT_LABEL.get(prompt, prompt)} 프롬프트 "
+             "(문항마다 수 초~수십 초)",
              "O = 의도까지 일치 · △ = 검증은 통과했지만 요청한 값과 다름 · X = 실패"]
     yield "\n".join(lines)
     rows = []
@@ -474,10 +475,9 @@ def build_ui():
                     o_video = gr.Video(label="결과 영상")
                     with gr.Accordion("렌더링 로그", open=False):
                         o_log = gr.Textbox(lines=8, show_label=False)
-            with gr.Accordion("모델 벤치마크 (논문용: 정확도 · 첫 시도 성공률 · 평균 수정 횟수)", open=False):
+            with gr.Accordion("모델 벤치마크 (논문 표 4: 라우팅 · 의도 일치, 최종 프롬프트)", open=False):
                 with gr.Row():
                     o_bset = gr.Radio(["dev", "holdout"], value="dev", label="문항 세트 (개발 18 · 보류 20)")
-                    o_bprompt = gr.Radio(["v1", "v2"], value=lr.DEFAULT_PROMPT, label="프롬프트 버전")
                     o_bbtn = gr.Button("선택한 모델로 실행", size="sm")
                 o_bench = gr.Textbox(lines=24, show_label=False)
 
@@ -485,7 +485,7 @@ def build_ui():
             demo.load(ollama_models, o_url, [o_model, o_conn])
             o_parse.click(llm_parse, [o_req, o_model, o_url], [o_status, o_json, o_attempts, o_state])
             o_render.click(llm_render, [o_q, o_state], [o_status, o_video, o_log])
-            o_bbtn.click(llm_bench, [o_model, o_url, o_bset, o_bprompt], o_bench)
+            o_bbtn.click(llm_bench, [o_model, o_url, o_bset], o_bench)
 
         # -------------------------------------------------- 역전파
         with gr.Tab("역전파 (Backpropagation)"):

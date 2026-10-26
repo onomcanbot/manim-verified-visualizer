@@ -16,10 +16,10 @@ LLM은 코드를 쓰지 않는다. "어느 템플릿을 어떤 설정값으로" 
 실행
   python llm_router.py "정답을 0으로 바꾼 역전파 보여줘"
   python llm_router.py --models                          # 설치된 모델 목록
-  python llm_router.py --bench --model gemma4:26b        # 벤치마크 (논문용)
+  python llm_router.py --bench --model gemma4:26b        # 벤치마크 (논문 표 4, 최종 프롬프트)
   python llm_router.py --bench --model gemma4:26b,hermes3:8b   # 여러 모델 연속 비교 + 비교표
-  python llm_router.py --bench --model hermes3:8b --prompt v1,v2  # 프롬프트 개선 전후 비교 (개발셋+보류셋)
-  옵션 : --set dev|holdout|all (기본 all)  --prompt v1|v2|v1,v2 (기본 v2)
+  옵션 : --set dev|holdout|all (기본 all)
+  옵션 : --prompt v2|v1 (기본 v2 = 논문에 쓴 최종 프롬프트. v1은 개발 초기 기준선으로, 비교용으로만 남겨 둠)
   옵션 : --url http://127.0.0.1:11434  --model <이름>
 ================================================================================
 """
@@ -149,7 +149,8 @@ SYSTEM_PROMPT_V2 = """너는 공학 개념 시각화 도구의 '요청 해석기
 """
 
 PROMPTS = {"v1": SYSTEM_PROMPT_V1, "v2": SYSTEM_PROMPT_V2}
-DEFAULT_PROMPT = "v2"
+DEFAULT_PROMPT = "v2"                      # 최종 프롬프트 (논문 표 4의 결과)
+PROMPT_LABEL = {"v2": "최종", "v1": "개발 초기"}
 SYSTEM_PROMPT = SYSTEM_PROMPT_V2          # 하위 호환
 
 REPAIR_MSG = {
@@ -437,7 +438,7 @@ def parse_json(text: str):
 # ============================================================================
 def route(request: str, model: str, url: str = DEFAULT_URL, max_repair: int = MAX_REPAIR,
           prompt: str = DEFAULT_PROMPT) -> dict:
-    """prompt='v1' : 처음 버전 (논문의 기준선) / 'v2' : 오류 분석 후 개선 버전."""
+    """prompt='v2'(기본) : 최종 프롬프트 (논문 표 4) / 'v1' : 개발 초기 기준선 (논문에는 쓰지 않음)."""
     messages = [{"role": "system", "content": PROMPTS[prompt]},
                 {"role": "user", "content": f"요청: {request}"}]
     log, t_all = [], time.time()
@@ -697,7 +698,7 @@ if __name__ == "__main__":
         for m in [x.strip() for x in (model or "").split(",") if x.strip()]:
             for p in prompts:
                 for st in sets:
-                    print(f"\n벤치마크: {m} · 세트 {st} ({len(SETS[st])}문항) · 프롬프트 {p}"
+                    print(f"\n벤치마크: {m} · 세트 {st} ({len(SETS[st])}문항) · 프롬프트 {p}({PROMPT_LABEL.get(p, '?')})"
                           + ("  ※ 클라우드 모델" if is_cloud(m) else ""))
                     table.append(bench(m, url, st, p))
                     print(f"  → 저장: {table[-1]['saved']}")

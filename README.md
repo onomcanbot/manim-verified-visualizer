@@ -45,14 +45,14 @@ LLM은 코드를 쓰지 않습니다. LLM이 쓴 설명은 참고용이며, 영�
 ```cmd
 python llm_router.py --models
 python llm_router.py "정답을 0으로 바꾼 역전파 보여줘" --model gemma4:26b
-python llm_router.py --bench --model gemma4:26b          # 18문항 벤치마크 → web_runs/bench_*.json
+python llm_router.py --bench --model gemma4:26b          # 벤치마크(개발 18 + 보류 20문항) → web_runs/bench_*.json
 python llm_router.py --bench --model gemma4:26b,hermes3:8b   # 여러 모델 연속 실행 + 비교표
-python llm_router.py --bench --model gemma4:26b,hermes3:8b --prompt v1,v2   # 프롬프트 개선 전후 비교
 ```
 
-- 문항 세트: `--set dev` (개발 18문항, v2 개선에 사용) · `--set holdout` (보류 20문항, 개선에 쓰지 않음) · 기본은 둘 다
-- 프롬프트: `v1` (처음 버전, 기준선) · `v2` (오류 분석 후 개선, 기본값)
-- 개선 효과의 일반화는 **보류 세트** 결과로 판단합니다
+- 문항 세트: `--set dev` (개발 18문항, 프롬프트를 만들 때 참고) · `--set holdout` (보류 20문항, 프롬프트를 완성한 뒤 따로 작성) · 기본은 둘 다
+- 프롬프트: 기본값이 논문에 쓴 **최종 프롬프트**입니다. 개발 초기 기준선(`--prompt v1`)은 비교용으로 코드에만 남겨 두었고 논문에는 쓰지 않았습니다.
+- 결과가 개발 문항에만 맞춰진 것인지는 **보류 세트** 결과로 판단합니다
+- LLM 호출은 온도 0, 시드 42로 고정합니다
 
 벤치마크 지표:
 
@@ -112,6 +112,25 @@ set SNAP_STEPS=51 && python layout_check.py backprop_demo.py BackpropChainRule  
 ```
 
 3D 장면은 화면 고정 글자만 검사하므로 실제 렌더링 화면으로 한 번 더 확인하세요.
+
+## 논문 결과 재현
+
+이 저장소를 소개한 전자공학회지 특집원고의 수치는 아래 명령으로 다시 얻을 수 있습니다. 계산 모듈(`*_core.py`)은 NumPy·SciPy만 쓰므로 Manim 없이도 실행됩니다.
+
+| 본문 | 명령 | 나와야 하는 결과 |
+|---|---|---|
+| Ⅲ.2 역전파 수치미분 대조 | `python backprop_core.py` | 데모 값 최대 오차 3.98e-12(≈4.0×10⁻¹²), 허용 1e-8 → PASS |
+| Ⅳ.1 역전파 1회 갱신 | (같은 명령) | 손실 0.0829 → 0.0658 |
+| Ⅳ.1 셀프 어텐션 | `python attention_core.py` | '먹었다' → '생선을' 가중치 0.52, 독립 구현 대조 PASS |
+| Ⅳ.1 GCN | `python gcn_core.py` | 독립 구현·불변식 5종 대조 PASS (노드 C는 자기 자신 포함 메시지 4개) |
+| Ⅳ.1 GAN 모드 붕괴 | `python gan_core.py` | 기본 GAN 1/8 모드, PacGAN 8/8 모드 (3,000단계, 수 분 소요) |
+| Ⅳ.1 시드 0~4 요약 | `python gan_core.py --seeds 5` | 덮은 모드 평균: 기본 GAN 1.4, PacGAN 7.4 |
+| Ⅳ.2 표 3 오류 주입 18종 | `python backprop_core.py --inject` · `attention_core.py --inject` · `gcn_core.py --inject` · `gan_core.py --inject` | 3/3 · 4/4 · 6/6 · 5/5 차단 (GAN은 600단계 학습으로 시험) |
+| Ⅲ.3 깔끔한 예제가 숨기는 버그 | (위 `--inject` 출력) | 어텐션 'V 대신 K'와 GCN 정규 그래프의 행 정규화는 데모 값만으로는 PASS(놓침), 무작위 20세트를 더하면 FAIL |
+| Ⅳ.3 표 4 LLM 벤치마크 | `python llm_router.py --bench --model gemma4:26b,hermes3:8b` | Ollama와 두 모델 필요. 라우팅 95% 이상, 의도 일치 89~100% (RTX 3090 기준, 모델 판에 따라 달라질 수 있음) |
+| Ⅳ.4 화면 배치 검사 | `python layout_check.py backprop_demo.py BackpropChainRule` (나머지: `attention_demo.py SelfAttention`, `gcn_demo.py GCNMessagePassing`, `gan_demo.py GANModeCollapse`) | 네 장면 모두 문제 0건 (Manim 필요) |
+
+웹 화면의 역전파 탭은 현재 설정의 오차와 무작위 20세트를 포함한 최악 오차를 함께 보여 줍니다. 본문의 4.0×10⁻¹²는 앞의 값입니다.
 
 ## 참고
 
