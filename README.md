@@ -1,5 +1,7 @@
 # 검증형 Manim 시각화 생성기
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24267629.svg)](https://doi.org/10.5281/zenodo.24267629)
+
 > 대한전자공학회 「전자공학회지」 2026년 특집 기고문 「바이브 코딩으로 상상하고, 수학 애니메이션 도구로 그리는 공학」(정태원·안성수, 게재 예정)의 구현 코드입니다. 논문의 수치를 다시 얻는 방법은 아래 [논문 결과 재현](#논문-결과-재현)을, 인용 방법은 [인용](#인용)을 보세요.
 >
 > *English summary:* A web tool that turns deep-learning concepts (backpropagation, self-attention, GCN message passing, GAN mode collapse) into Manim animations **only after the numbers pass automatic verification** (numerical differentiation, independent implementations, invariants, reproducibility). A local LLM (Ollama) only picks a template and its settings; it never writes the rendering code.
@@ -158,6 +160,10 @@ macOS·Linux에서는 `SNAP_STEPS=51 python layout_check.py backprop_demo.py Bac
 이 코드를 사용하거나 참고하셨다면 아래 논문을 인용해 주세요. 저장소 오른쪽의 **Cite this repository**(`CITATION.cff`)에서도 같은 정보를 볼 수 있습니다. 권·호·쪽은 게재 후 추가합니다.
 
 > 정태원, 안성수, "바이브 코딩으로 상상하고, 수학 애니메이션 도구로 그리는 공학," 전자공학회지, 2026 (게재 예정).
+
+코드 자체를 인용할 때는 Zenodo에 보관된 v1.0.0을 쓸 수 있습니다.
+
+> T. Jung, "manim-verified-visualizer," v1.0.0, Zenodo, 2026. doi: 10.5281/zenodo.24267629
 
 ## 라이선스
 
