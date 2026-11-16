@@ -2,6 +2,14 @@ cff-version: 1.2.0
 message: "이 소프트웨어를 사용하면 아래 논문을 인용해 주세요. (If you use this software, please cite the paper below.)"
 title: "manim-verified-visualizer: 검증형 Manim 시각화 생성기"
 type: software
+abstract: >-
+  A web tool that turns deep-learning concepts (backpropagation,
+  self-attention, GCN message passing, GAN mode collapse) into Manim
+  animations only after the numbers pass automatic verification
+  (numerical differentiation, independent implementations, invariants,
+  reproducibility). A local LLM only selects a template and its settings.
+  Implementation code for a 2026 special-issue article in The Magazine of
+  the IEIE (전자공학회지).
 authors:
   - family-names: Jung
     given-names: Taewon
@@ -15,9 +23,12 @@ keywords:
   - education
   - llm
   - deep-learning
+  - verification
+  - gradio
+  - ollama
 preferred-citation:
   type: article
-  title: "바이브 코딩으로 상상하고 수학 애니메이션 도구로 그리는 공학"
+  title: "바이브 코딩으로 상상하고, 수학 애니메이션 도구로 그리는 공학"
   authors:
     - family-names: "정"
       given-names: "태원"

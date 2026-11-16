@@ -1,6 +1,8 @@
 # 검증형 Manim 시각화 생성기
 
-> 대한전자공학회 「전자공학회지」 2026년 특집 기고문 「바이브 코딩으로 상상하고 수학 애니메이션 도구로 그리는 공학」(정태원·안성수, 게재 예정)의 구현 코드입니다. 논문의 수치를 다시 얻는 방법은 아래 [논문 결과 재현](#논문-결과-재현)을 보세요.
+> 대한전자공학회 「전자공학회지」 2026년 특집 기고문 「바이브 코딩으로 상상하고, 수학 애니메이션 도구로 그리는 공학」(정태원·안성수, 게재 예정)의 구현 코드입니다. 논문의 수치를 다시 얻는 방법은 아래 [논문 결과 재현](#논문-결과-재현)을, 인용 방법은 [인용](#인용)을 보세요.
+>
+> *English summary:* A web tool that turns deep-learning concepts (backpropagation, self-attention, GCN message passing, GAN mode collapse) into Manim animations **only after the numbers pass automatic verification** (numerical differentiation, independent implementations, invariants, reproducibility). A local LLM (Ollama) only picks a template and its settings; it never writes the rendering code.
 
 슬라이더로 값을 바꾸고, **검증을 통과한 경우에만** Manim 영상을 만드는 웹 화면입니다.
 
@@ -90,8 +92,14 @@ python llm_router.py --bench --model gemma4:26b,hermes3:8b   # 여러 모델 연
 같은 설정 파일로 언제든 같은 영상을 다시 만들 수 있습니다.
 
 ```cmd
+:: Windows (cmd)
 set BACKPROP_CONFIG=web_runs\backprop_20261007_120000\config.json
 manim -pql backprop_demo.py BackpropChainRule
+```
+
+```bash
+# macOS / Linux
+BACKPROP_CONFIG=web_runs/backprop_20261007_120000/config.json manim -pql backprop_demo.py BackpropChainRule
 ```
 
 ## 명령줄에서 검증만
@@ -110,8 +118,10 @@ python gan_core.py --inject --seeds 5     # 학습 포함, 2~3분
 ```cmd
 python layout_check.py backprop_demo.py BackpropChainRule
 python layout_check.py gcn_demo.py GCNMessagePassing
-set SNAP_STEPS=51 && python layout_check.py backprop_demo.py BackpropChainRule   # 51단계 정지 화면 저장
+set SNAP_STEPS=51 && python layout_check.py backprop_demo.py BackpropChainRule   # 51단계 정지 화면 저장 (Windows)
 ```
+
+macOS·Linux에서는 `SNAP_STEPS=51 python layout_check.py backprop_demo.py BackpropChainRule`처럼 씁니다.
 
 3D 장면은 화면 고정 글자만 검사하므로 실제 렌더링 화면으로 한 번 더 확인하세요.
 
@@ -134,12 +144,20 @@ set SNAP_STEPS=51 && python layout_check.py backprop_demo.py BackpropChainRule  
 
 웹 화면의 역전파 탭은 현재 설정의 오차와 무작위 20세트를 포함한 최악 오차를 함께 보여 줍니다. 본문의 4.0×10⁻¹²는 앞의 값입니다.
 
+계산 모듈의 결과(표의 Ⅲ.2~Ⅳ.2 행)는 2026-11-16에 Python 3.13, NumPy 2.5.3, SciPy 1.18.1 환경에서 다시 실행해 위 값과 같음을 확인하였습니다.
+
 ## 참고
 
-- 한글 폰트 기본값은 맑은 고딕. 바꾸려면 `set KO_FONT=NanumGothic`
+- 한글 폰트 기본값은 맑은 고딕. 바꾸려면 `set KO_FONT=NanumGothic` (macOS·Linux: `export KO_FONT=NanumGothic`)
 - 어텐션 영상 레이아웃은 단어 3개, 2차원 임베딩 기준
 - GCN 영상 레이아웃은 노드 5개, 2차원 특징 기준 (간선은 자유롭게)
 - GAN 탭은 검증 단계에서 실제 학습과 재학습을 하므로 검증에만 수십 초가 걸립니다
+
+## 인용
+
+이 코드를 사용하거나 참고하셨다면 아래 논문을 인용해 주세요. 저장소 오른쪽의 **Cite this repository**(`CITATION.cff`)에서도 같은 정보를 볼 수 있습니다. 권·호·쪽은 게재 후 추가합니다.
+
+> 정태원, 안성수, "바이브 코딩으로 상상하고, 수학 애니메이션 도구로 그리는 공학," 전자공학회지, 2026 (게재 예정).
 
 ## 라이선스
 
